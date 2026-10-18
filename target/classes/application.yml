@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: krishione-portal
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/krishionedb}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        jdbc:
+          batch_size: 25
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+      timeout: 2000ms
+
+  cache:
+    type: ${SPRING_CACHE_TYPE:redis}
+    redis:
+      time-to-live: 3600000 # 1 hour
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# JWT Security Settings
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration-ms: 86400000 # 24 hours
+
+# MP Mandi e-Anugya & data.gov.in Sync Settings
+eanugya:
+  url: ${EANUGYA_URL:https://eanugya.mp.gov.in/Inward_Quote.aspx}
+  timeout-ms: 10000
+  enabled: true
+
+datagov:
+  api:
+    url: ${DATAGOV_API_URL:https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070}
+    key: ${DATAGOV_API_KEY:579b464db66ec23bdd000001cdd394715a544b64700f71cae92b0000}
+    format: json
+    limit: 100
+  sync:
+    cron: ${DATAGOV_SYNC_CRON:0 0 6 * * ?} # Daily 6:00 AM
+
+logging:
+  level:
+    com.krishione: INFO
+    org.springframework.security: WARN
+    org.flywaydb: INFO
